@@ -4,6 +4,8 @@ docker-textlint
 Docker container with textlint.  
 [textlint](http://textlint.github.io/) is Node.js based text linting utility for markdown and plaintext.
 
+forked from https://github.com/miy4/docker-textlint
+
 ### Rules
 
 This image contains textlint rules as follows:
