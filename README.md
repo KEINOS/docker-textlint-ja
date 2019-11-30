@@ -8,6 +8,8 @@ Docker container with textlint.
 
 This image contains textlint rules as follows:
 
+- [textlint-rule-prh](https://www.npmjs.com/package/textlint-rule-prh)
+- [textlint-rule-no-todo](https://www.npmjs.com/package/textlint-rule-no-todo)
 - [textlint-rule-preset-jtf-style](https://www.npmjs.com/package/textlint-rule-preset-jtf-style)
 - [textlint-rule-max-ten](https://www.npmjs.com/package/textlint-rule-max-ten)
 - [textlint-rule-no-doubled-joshi](https://www.npmjs.com/package/textlint-rule-no-doubled-joshi)
@@ -20,15 +22,15 @@ This image contains textlint rules as follows:
 To pull:
 
 ```sh
-$ docker pull miy4/textlint
+$ docker pull shimizukawa/textlint
 ```
 
 To build:
 
 ```sh
-$ git clone https://github.com/miy4/docker-textlint.git
+$ git clone https://github.com/shimizukawa/docker-textlint.git
 $ cd docker-textlint
-$ docker build -t miy4/textlint .
+$ docker build -t shimizukawa/textlint .
 ```
 
 ### Usage
@@ -41,7 +43,7 @@ $ vi .textlintrc
 See [textlint/docs/configuring.md](https://github.com/textlint/textlint/blob/master/docs/configuring.md) and [textlint/examples/config-file/](https://github.com/textlint/textlint/blob/master/examples/config-file) for more details.
 
 ```sh
-$ docker run -v ${PWD}:/data -w /data miy4/textlint <TEXTLINT_ARGS>
+$ docker run -v ${PWD}:/data -w /data shimizukawa/textlint <TEXTLINT_ARGS>
 # or
 $ /path/to/run-textlint <TEXTLINT_ARGS>
 ```
