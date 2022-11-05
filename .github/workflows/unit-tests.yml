@@ -1,0 +1,62 @@
+name: UnitTests
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PATH_CACHE: /tmp/docker-img-arch
+
+jobs:
+  test:
+    name: Run tests for textlint rules via container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Create cache ID from file hash
+        uses: KEINOS/gh-action-hash-for-cache@main
+        id: imagetag
+        # The cache ID/hash is updated when the following files are modified or when the month changes.
+        with:
+          path: |
+            ./Dockerfile
+            ./tests/Dockerfile
+            ./package-spec
+            ./textlintrc
+          variant: $(TZ=UTC-9 date '+%Y%m')
+
+      - name: Enable Cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.PATH_CACHE }}
+          key: ${{ steps.imagetag.outputs.hash }}
+
+      - name: Load cached Docker images if any
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          docker load --input ${{ env.PATH_CACHE }}/${{ steps.imagetag.outputs.hash }}/local.tar
+          docker load --input ${{ env.PATH_CACHE }}/${{ steps.imagetag.outputs.hash }}/test.tar
+
+      - name: Build Docker images if no-cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          : # Pull images one-by-one for stability
+          docker pull node:alpine
+          : # Build image
+          ./build-tests.sh
+
+      - name: Save/export built images to cache dir if no-cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ${{ env.PATH_CACHE }}/${{ steps.imagetag.outputs.hash }}
+          docker save --output ${{ env.PATH_CACHE }}/${{ steps.imagetag.outputs.hash }}/local.tar textlint/textlint:local
+          docker save --output ${{ env.PATH_CACHE }}/${{ steps.imagetag.outputs.hash }}/test.tar textlint/textlint:test
+
+      - name: Run tests
+        run: ./run-tests.sh
